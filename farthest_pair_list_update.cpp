@@ -105,9 +105,12 @@ using namespace std;
 
 // string manipulations
 
+// patterned transformation
 
 
+string getfilename();
 int current_word_index = 0;
+
 
 char process(vector<string> arrayofwords) {
     if (arrayofwords.size() == 0) {
@@ -123,6 +126,8 @@ char process(vector<string> arrayofwords) {
         cout << arrayofwords[current_word_index] << "\n";
         Sleep(1000);
         current_word_index++;
+        system("cls");
+        
     }
 }
 
@@ -140,14 +145,15 @@ int main()
             arrayofwords.push_back(word);
             cout << word << " added\n";
         }
-        if (cmd == ". clear") {
+        else if (cmd == ". clear") {
             arrayofwords.clear();
             cout << "words cleared\n";
         }
-        if (cmd == ". save") {
+        else if (cmd == ". save") {
             cout << "enter save filepath: ";
             string filepath_save;
-            getline(cin, filepath_save);
+            filepath_save = getfilename();
+            //getline(cin, filepath_save);
             ofstream f_save(filepath_save);
             for (int i = 0; i < arrayofwords.size(); i++) {
                 f_save << arrayofwords[i] << "\n";
@@ -155,10 +161,11 @@ int main()
             f_save.close();
             cout << arrayofwords.size() << " words saved to file " << filepath_save << "\n";
         }
-        if (cmd == ". load") {
+        else if (cmd == ". load") {
             cout << "enter load filepath: ";
             string filepath_load;
-            getline(cin, filepath_load);
+            filepath_load = getfilename();
+            //getline(cin, filepath_load);
             ifstream f_read(filepath_load);
 
             int f_read_count = 0;
@@ -172,14 +179,61 @@ int main()
             cout << f_read_count << " words read from file " << filepath_load << "\n";
 
         }
-        if (cmd == ". process") {
+        else if (cmd == ". process") {
             process(arrayofwords);
         }
-        if (cmd == ". cheer up") {
+        else if (cmd == ". cheer up") {
             cout << "remember joy together\n";
+        }
+        else {
+            cout << "invalid command\n";
         }
         
     }
 }
 
 
+string getfilename() // select file dialog box and returns file path as string
+{
+    char filename[MAX_PATH];
+
+    OPENFILENAME ofn;
+    ZeroMemory(&filename, sizeof(filename));
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+    ofn.lpstrFilter = "Text Files\0*.txt\0Any File\0*.*\0";
+    ofn.lpstrFile = filename;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.lpstrTitle = "Select a File, yo!";
+    ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileName(&ofn))
+    {
+        return filename;
+    }
+    else
+    {
+        // All this stuff below is to tell you exactly how you messed up above. 
+        // Once you've got that fixed, you can often (not always!) reduce it to a 'user cancelled' assumption.
+        switch (CommDlgExtendedError())
+        {
+        case CDERR_DIALOGFAILURE: std::cout << "CDERR_DIALOGFAILURE\n";   break;
+        case CDERR_FINDRESFAILURE: std::cout << "CDERR_FINDRESFAILURE\n";  break;
+        case CDERR_INITIALIZATION: std::cout << "CDERR_INITIALIZATION\n";  break;
+        case CDERR_LOADRESFAILURE: std::cout << "CDERR_LOADRESFAILURE\n";  break;
+        case CDERR_LOADSTRFAILURE: std::cout << "CDERR_LOADSTRFAILURE\n";  break;
+        case CDERR_LOCKRESFAILURE: std::cout << "CDERR_LOCKRESFAILURE\n";  break;
+        case CDERR_MEMALLOCFAILURE: std::cout << "CDERR_MEMALLOCFAILURE\n"; break;
+        case CDERR_MEMLOCKFAILURE: std::cout << "CDERR_MEMLOCKFAILURE\n";  break;
+        case CDERR_NOHINSTANCE: std::cout << "CDERR_NOHINSTANCE\n";     break;
+        case CDERR_NOHOOK: std::cout << "CDERR_NOHOOK\n";          break;
+        case CDERR_NOTEMPLATE: std::cout << "CDERR_NOTEMPLATE\n";      break;
+        case CDERR_STRUCTSIZE: std::cout << "CDERR_STRUCTSIZE\n";      break;
+        case FNERR_BUFFERTOOSMALL: std::cout << "FNERR_BUFFERTOOSMALL\n";  break;
+        case FNERR_INVALIDFILENAME: std::cout << "FNERR_INVALIDFILENAME\n"; break;
+        case FNERR_SUBCLASSFAILURE: std::cout << "FNERR_SUBCLASSFAILURE\n"; break;
+        default: std::cout << "You cancelled.\n";
+        }
+    }
+}
