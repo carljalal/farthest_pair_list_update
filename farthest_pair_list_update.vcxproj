@@ -141,6 +141,11 @@
   <ItemGroup>
     <ClCompile Include="farthest_pair_list_update.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\cpp_code_snippets\cpp_code_snippets.vcxproj">
+      <Project>{681bdb54-324f-41df-b3ba-02c7c4dd8c31}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

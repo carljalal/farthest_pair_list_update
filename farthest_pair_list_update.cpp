@@ -8,13 +8,14 @@
 #include "conio.h"
 #include "string"
 #include "fstream"
+#include "easy_utility_functions.h"
 using namespace std;
 
 // read file or text
 // vectorize
 // have id's
 // parsing by line, by delimiter, into arrays
-
+// doing the right thing
 
 // interactive loop with instructions/directions
 // automatic (optional) process
