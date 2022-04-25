@@ -8,7 +8,9 @@
 #include "conio.h"
 #include "string"
 #include "fstream"
-#include "easy_utility_functions.h"
+#include "../cpp_code_snippets/easy_utility_functions.h"
+#include <sstream>
+#include "algorithm"
 using namespace std;
 
 // read file or text
@@ -80,8 +82,12 @@ using namespace std;
 // interactions, instructions (interrupt, prompt)
 
 // code exploration
+// waiting for something
 
 // high level
+
+// learning how to write
+// reading how to write
 
 // 1 add
 // 2 clear
@@ -108,12 +114,14 @@ using namespace std;
 
 // patterned transformation
 
+// hugs
+// great healing
 
-string getfilename();
+
 int current_word_index = 0;
+int speed = 1000;
 
-
-char process(vector<string> arrayofwords) {
+char process(vector<string> &arrayofwords) {
     if (arrayofwords.size() == 0) {
         cout << "no words in array!\n";
         return -1;
@@ -125,21 +133,250 @@ char process(vector<string> arrayofwords) {
         }
         if (current_word_index >= arrayofwords.size()) current_word_index = 0;
         cout << arrayofwords[current_word_index] << "\n";
-        Sleep(1000);
+        Sleep(speed);
         current_word_index++;
         system("cls");
         
     }
 }
 
+INT64 count_file_lines(string filename) {
+    INT64 count = 0;
+    INT64 textcount = 0;
+    ifstream ifile(filename);
+
+    
+
+    string s;
+    while (ifile) {
+        getline(ifile, s);
+        count++;
+        //textcount += s.size();
+        if (count % 1000 == 0) {
+            cout << "count: " << count << '\n'; //", text size: " << textcount << "\n";
+            
+        }
+    }
+    ifile.close();
+
+    cout << "there are " << count << " lines in this file!\n";
+    return count;
+}
+
+void save_file(vector<string>& arrayofwords, string filepath_save) {
+    ofstream f_save(filepath_save);
+    for (int i = 0; i < arrayofwords.size(); i++) {
+        f_save << arrayofwords[i] << "\n";
+    }
+    f_save.close();
+    cout << arrayofwords.size() << " words saved to file " << filepath_save << "\n";
+}
+
+void find_word_in_file(string fs) {
+    INT64 count = 0;
+    INT64 wordfound = 0;
+    ifstream ifile(getfilename());
+
+
+
+    string s;
+    while (ifile) {
+        getline(ifile, s, ' ');
+        if(fs == s) 
+            wordfound++;
+        count++;
+        if (count % 1000 == 0) {
+            cout << "count: " << count << ", text size: " << wordfound << "\n";
+        }
+    }
+    ifile.close();
+
+    cout << "there are " << wordfound << " lines in this file!\n";
+    return;
+}
+// peace, patience
+void find_word_in_vector(int width, string s, vector<string> &sv) {
+    if (sv.size() <= 0) return;
+    INT64 count = 0;
+    vector<string> temp_vector;
+    for (INT64 i = 0; i < sv.size(); i++) {
+        if (s == sv[i]) {
+            //count++;
+            temp_vector.push_back(s);
+            if (width < 0) {
+                for (int j = width; j < 0 && i+j >=0 && i+j <sv.size(); j++) {
+                    temp_vector.back() += " " + sv[i + j];
+                }
+            }
+            if (width > 0) {
+                for (int j = 1; j < width && i + j >= 0 && i + j < sv.size(); j++) {
+                    temp_vector.back() += " " + sv[i + j];
+                }
+            }
+            //cout << '\n';
+        }
+    }
+    sort(temp_vector.begin(), temp_vector.end());
+    vector<string> temp_vector2;
+    vector<int> temp_vector2_count;
+    count = 1;
+    INT64 count_unique = 0;
+    for (INT64 i = 1; i < temp_vector.size(); i++) {
+        if (temp_vector[i] != temp_vector[i - 1]) {
+            //cout << temp_vector[i - 1] << " " << count << "\n";
+            temp_vector2.push_back(temp_vector[i - 1]);
+            temp_vector2_count.push_back(count);
+            count = 0;
+            count_unique++;
+        }
+        count++;
+    }
+    count_unique++;
+    cout << temp_vector.back() << " " << count << "\n";
+    cout << count_unique << " unique phrases found!\n";
+    temp_vector2.push_back(temp_vector.back());
+    temp_vector2_count.push_back(count);
+    string filename = s + to_string(width) + ".txt";
+
+    vector<string> temp_vector3;
+    for (INT64 i = 0; i < temp_vector2.size(); i++) {
+        temp_vector3.push_back(to_string(temp_vector2_count[i]) + "," + temp_vector2[i]);
+    }
+
+    save_file(temp_vector3, filename);
+    system(filename.c_str());
+    //cout << "we found " << s << " " << count << " times!\n";
+}
+
+void parse_string_into_vector_by_delimiter(string s, char c, vector<string> &sv) {
+    stringstream ss(s);
+    while (ss) {
+        string new_s;
+        getline(ss, new_s, c);
+        if (new_s != "") {
+            sv.push_back(new_s);
+        }
+    }
+}
+
+void parse_file_into_vector_by_delimiter(char delimiter, vector<string> &sv) {
+    ifstream ifile(getfilename());
+    INT64 count = 0;
+    while (ifile) {
+        count++;
+        string s;
+        getline(ifile, s, '\n');
+        if (s != "") {
+            parse_string_into_vector_by_delimiter(s, delimiter, sv);
+            
+        }
+        if (count % 1000 == 0) {
+            //sv.shrink_to_fit();
+            cout << count << "\n";
+        }
+    }
+    ifile.close();
+}
+
+void split_file() {
+    string str_splits = prompt_cin_input("enter number of splits: ");
+    int splits = stoi(str_splits);
+    string ifilename = getfilename();
+    INT64 filelines = count_file_lines(ifilename);
+    ifstream ifile(ifilename);
+
+    INT64 interval = filelines / splits;
+    for (int split = 1; split <= splits; split++) {
+        ofstream ofile(ifilename + to_string(split));
+        if (split == splits) {
+            while (ifile)
+            {
+                string s;
+                getline(ifile, s);
+                if (s != "") {
+                    ofile << s << '\n';
+                }
+            }
+        }
+        else {
+            for (INT64 i = 0; i < interval; i++) {
+                string s;
+                getline(ifile, s);
+                ofile << s << '\n';
+            }
+        }
+    }
+}
+
+void list_help() {
+    cout << ". split file\n";
+    cout << ". file to vector\n";
+    cout << ". find word in vector \n";
+    cout << ". countlines\n";
+    cout << ". add\n";
+    cout << ". clear\n";
+    cout << ". save\n";
+    cout << ". load file\n";
+    cout << ". load html\n";
+    cout << ". process\n";
+    cout << ". cheer up\n";
+    cout << ". help\n";
+}
+
+
+
+
 int main()
 {
+
+
+
+
+
+    //getchar();
+    list_help();
     vector<string> arrayofwords;
     while (1) {
         cout << "enter cmd: ";
         string cmd;
         getline(cin, cmd);
-        if (cmd == ". add") {
+        if (cmd == ". split file") {
+            split_file();
+        }
+        if (cmd == ". help") {
+            list_help();
+        }
+        else if (cmd == ". file to vector") {
+            string delimiter;
+            cout << "enter delimiter: ";
+            getline(cin, delimiter);
+            parse_file_into_vector_by_delimiter(delimiter[0], arrayofwords);
+        }
+        else if (cmd.substr(0, 22) == ". find word in vector ") {
+            {
+                int length_of_beginning_of_command = 22;
+                int move_for_next_word = 1;
+                char space_between_words = ' ';
+                int position_after_second_space = cmd.find(space_between_words, length_of_beginning_of_command) + move_for_next_word;
+                string w = cmd.substr(position_after_second_space);
+                int position_of_second_space = cmd.find(space_between_words, length_of_beginning_of_command);
+                int width = stoi(cmd.substr(length_of_beginning_of_command, position_of_second_space));
+                //getline(cin, w);
+                find_word_in_vector(width, w, arrayofwords);
+            }
+        }
+        else if (cmd.substr(0, 8) == ". speed ") {
+            {
+                int length_of_beginning_of_command = 8;
+                int start_of_command = 0;
+                speed = stoi(cmd.substr(length_of_beginning_of_command));
+            }
+        }
+        else if (cmd == ". countlines") {
+            string filepath = getfilename();
+            count_file_lines(filepath);
+        }
+        else if (cmd == ". add") {
             cout << "enter word: ";
             string word;
             getline(cin, word);
@@ -155,14 +392,9 @@ int main()
             string filepath_save;
             filepath_save = getfilename();
             //getline(cin, filepath_save);
-            ofstream f_save(filepath_save);
-            for (int i = 0; i < arrayofwords.size(); i++) {
-                f_save << arrayofwords[i] << "\n";
-            }
-            f_save.close();
-            cout << arrayofwords.size() << " words saved to file " << filepath_save << "\n";
+            save_file(arrayofwords, filepath_save);
         }
-        else if (cmd == ". load") {
+        else if (cmd == ". load file") {
             cout << "enter load filepath: ";
             string filepath_load;
             filepath_load = getfilename();
@@ -180,6 +412,16 @@ int main()
             cout << f_read_count << " words read from file " << filepath_load << "\n";
 
         }
+        else if (cmd == ". load html") {
+            cout << "enter url: ";
+            string url;
+            getline(cin, url);
+            string ret = gethtml(url);
+            vector<string> list;
+            tokenize_string(list, ret);
+            append_vector(arrayofwords, list);
+            cout << "\n"<< list.size() <<" words from webpage have been added!\n";
+        }
         else if (cmd == ". process") {
             process(arrayofwords);
         }
@@ -193,48 +435,7 @@ int main()
     }
 }
 
-
-string getfilename() // select file dialog box and returns file path as string
-{
-    char filename[MAX_PATH];
-
-    OPENFILENAME ofn;
-    ZeroMemory(&filename, sizeof(filename));
-    ZeroMemory(&ofn, sizeof(ofn));
-    ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
-    ofn.lpstrFilter = "Text Files\0*.txt\0Any File\0*.*\0";
-    ofn.lpstrFile = filename;
-    ofn.nMaxFile = MAX_PATH;
-    ofn.lpstrTitle = "Select a File, yo!";
-    ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
-
-    if (GetOpenFileName(&ofn))
-    {
-        return filename;
-    }
-    else
-    {
-        // All this stuff below is to tell you exactly how you messed up above. 
-        // Once you've got that fixed, you can often (not always!) reduce it to a 'user cancelled' assumption.
-        switch (CommDlgExtendedError())
-        {
-        case CDERR_DIALOGFAILURE: std::cout << "CDERR_DIALOGFAILURE\n";   break;
-        case CDERR_FINDRESFAILURE: std::cout << "CDERR_FINDRESFAILURE\n";  break;
-        case CDERR_INITIALIZATION: std::cout << "CDERR_INITIALIZATION\n";  break;
-        case CDERR_LOADRESFAILURE: std::cout << "CDERR_LOADRESFAILURE\n";  break;
-        case CDERR_LOADSTRFAILURE: std::cout << "CDERR_LOADSTRFAILURE\n";  break;
-        case CDERR_LOCKRESFAILURE: std::cout << "CDERR_LOCKRESFAILURE\n";  break;
-        case CDERR_MEMALLOCFAILURE: std::cout << "CDERR_MEMALLOCFAILURE\n"; break;
-        case CDERR_MEMLOCKFAILURE: std::cout << "CDERR_MEMLOCKFAILURE\n";  break;
-        case CDERR_NOHINSTANCE: std::cout << "CDERR_NOHINSTANCE\n";     break;
-        case CDERR_NOHOOK: std::cout << "CDERR_NOHOOK\n";          break;
-        case CDERR_NOTEMPLATE: std::cout << "CDERR_NOTEMPLATE\n";      break;
-        case CDERR_STRUCTSIZE: std::cout << "CDERR_STRUCTSIZE\n";      break;
-        case FNERR_BUFFERTOOSMALL: std::cout << "FNERR_BUFFERTOOSMALL\n";  break;
-        case FNERR_INVALIDFILENAME: std::cout << "FNERR_INVALIDFILENAME\n"; break;
-        case FNERR_SUBCLASSFAILURE: std::cout << "FNERR_SUBCLASSFAILURE\n"; break;
-        default: std::cout << "You cancelled.\n";
-        }
-    }
-}
+// memory word pool
+// hope of doing good work
+// body
+// sustained slow focused meditations
